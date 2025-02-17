@@ -10,7 +10,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "rpi_bootloader_tool=menu:main"
+            "rpi-bootloader-tool=rpi_bootloader_tool.main:main"
         ]
     },
     author="Dein Name",

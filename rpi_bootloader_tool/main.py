@@ -5,8 +5,9 @@ import io
 import curses
 from tqdm import tqdm
 from datetime import datetime
-import bootloader_builder
-import eeprom_builder
+from rpi_bootloader_tool.modules import bootloader_builder
+from rpi_bootloader_tool.modules import eeprom_builder
+
 
 def get_bootloader(stdscr):
     stdscr.clear()
