@@ -5,16 +5,24 @@ import io
 import curses
 from tqdm import tqdm
 from datetime import datetime
+import bootloader_builder
+import eeprom_builder
 
 def get_bootloader(stdscr):
     stdscr.clear()
     stdscr.addstr(2, 2, "Downloading Bootloader...")
+    stdscr.refresh()
+    bootloader_builder.build_bootloader()  # Aufruf der Bootloader-Funktion
+    stdscr.addstr(4, 2, "Bootloader successfully built!")
     stdscr.refresh()
     stdscr.getch()
 
 def get_eeprom(stdscr):
     stdscr.clear()
     stdscr.addstr(2, 2, "Downloading EEPROM...")
+    stdscr.refresh()
+    eeprom_builder.build_eeprom()  # Aufruf der EEPROM-Funktion
+    stdscr.addstr(4, 2, "EEPROM successfully built!")
     stdscr.refresh()
     stdscr.getch()
 

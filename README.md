@@ -1,7 +1,7 @@
-# READMNE - Offical Raspberry Pi Bootloader
+# README - Offical Raspberry Pi Bootloader
 
 
-``m̀d
+```md
 Name:      rpi-boot-utility
 Author:    hexzhen3x7
 Version:   0.0.1
