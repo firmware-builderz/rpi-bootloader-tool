@@ -7,7 +7,7 @@ import io
 
 from tqdm import tqdm
 from datetime import datetime
-from rpi_bootloader_tool import *
+from rpitool import *
 
 
 

@@ -1,4 +1,4 @@
-from utils import check_dependencies
+from .utils import check_dependencies
 check_dependencies()
 
 
@@ -14,9 +14,9 @@ import curses
 from tqdm import tqdm
 from datetime import datetime
 
-from modules import *
-from modules import module_list, all_modules
-from utils import logo, about, update
+from .modules import *
+from .modules import module_list, all_modules
+from .utils import logo, about, update
 
 
 

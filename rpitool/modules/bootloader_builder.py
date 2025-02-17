@@ -6,7 +6,7 @@ import subprocess
 
 from tqdm import tqdm
 from datetime import datetime
-from rpi_bootloader_tool import *
+from rpitool import *
 
 
 
@@ -35,6 +35,7 @@ ALLOWED_EXTENSIONS = (".dtb", ".img", ".dat", ".elf")
 
 
 class Main(cmd.Cmd):
+    """RPI Bootloader Download Tool"""
    
     
     
