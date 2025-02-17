@@ -1,99 +1,178 @@
+from utils import check_dependencies
+check_dependencies()
+
+
+import cmd
 import os
+import sys
 import requests
 import zipfile
 import io
 import curses
+
+
 from tqdm import tqdm
 from datetime import datetime
-from rpi_bootloader_tool.modules import bootloader_builder
-from rpi_bootloader_tool.modules import eeprom_builder
+
+from modules import *
+from modules import module_list, all_modules
+from utils import logo, about, update
 
 
-def get_bootloader(stdscr):
-    stdscr.clear()
-    stdscr.addstr(2, 2, "Downloading Bootloader...")
-    stdscr.refresh()
-    bootloader_builder.build_bootloader()  # Aufruf der Bootloader-Funktion
-    stdscr.addstr(4, 2, "Bootloader successfully built!")
-    stdscr.refresh()
-    stdscr.getch()
 
-def get_eeprom(stdscr):
-    stdscr.clear()
-    stdscr.addstr(2, 2, "Downloading EEPROM...")
-    stdscr.refresh()
-    eeprom_builder.build_eeprom()  # Aufruf der EEPROM-Funktion
-    stdscr.addstr(4, 2, "EEPROM successfully built!")
-    stdscr.refresh()
-    stdscr.getch()
 
-def update(stdscr):
-    stdscr.clear()
-    stdscr.addstr(2, 2, "Checking for updates...")
-    stdscr.refresh()
-    stdscr.getch()
 
-def about(stdscr):
-    stdscr.clear()
-    stdscr.addstr(2, 2, "Raspberry Pi Bootloader - Download Utility\nVersion 1.0\nDeveloped by You")
-    stdscr.refresh()
-    stdscr.getch()
+completions = module_list()
 
-def help_menu(stdscr):
-    stdscr.clear()
-    stdscr.addstr(2, 2, "Help Section\nUse arrow keys to navigate and Enter to select.")
-    stdscr.refresh()
-    stdscr.getch()
 
-def draw_menu(stdscr):
-    curses.curs_set(0)
-    stdscr.clear()
-    stdscr.refresh()
+
+
+class RpiBootloaderTool(cmd.Cmd):
     
-    menu = ["Get Bootloader", "Get EEPROM", "Update", "About", "Help", "Exit"]
-    title = "Raspberry Pi Bootloader - Download Utility"
-    current_row = 0
+    update(where="main_menu")
+
     
-    while True:
-        stdscr.clear()
-        h, w = stdscr.getmaxyx()
-        stdscr.addstr(1, (w // 2) - (len(title) // 2), title, curses.A_BOLD | curses.A_UNDERLINE)
-        
-        for idx, row in enumerate(menu):
-            x = (w // 2) - (len(row) // 2)
-            y = 3 + idx
-            if idx == current_row:
-                stdscr.attron(curses.color_pair(1))
-                stdscr.addstr(y, x, row)
-                stdscr.attroff(curses.color_pair(1))
+    
+    intro = logo()
+    
+    prompt = 'rpi-tool > '
+    
+    doc_header = 'Commands'
+    undoc_header = 'Undocumented Commands'
+
+
+
+
+
+    def do_get_bootloader(self, arg):
+        "Download Bootloader: get_bootloader"
+        print("Bootloader Downloading...")
+
+    def do_get_eeprom(self, arg):
+        "Download EEPROM: get_eeprom"
+        print("EEPROM Downloading...")
+
+
+    def do_help(self, arg):
+        """
+        Zeigt allgemeine Hilfe für das Programm.
+        """
+        print("Hilfe: Willkommen im Raspberry Pi Bootloader - Download Utility.")
+        print("Verfügbare Befehle:")
+        print("  get_bootloader   - Download Bootloader")
+        print("  get_eeprom       - Download EEPROM")
+        print("  update           - Prüfe auf Updates")
+        print("  about            - Informationen über das Tool")
+        print("  help             - Zeigt diese Hilfe-Seite")
+        print("  exit             - Beendet das Tool")
+
+    def help_get_bootloader(self):
+        """
+        Zeigt spezifische Hilfe für den 'get_bootloader' Befehl.
+        """
+        print("get_bootloader - Lädt den Bootloader herunter.")
+        print("Verwendung: Geben Sie 'get_bootloader' ein, um den Bootloader herunterzuladen.")
+        print("Weitere Informationen finden Sie in der offiziellen Dokumentation.")
+
+    def help_get_eeprom(self):
+        """
+        Zeigt spezifische Hilfe für den 'get_eeprom' Befehl.
+        """
+        print("get_eeprom - Lädt das EEPROM herunter.")
+        print("Verwendung: Geben Sie 'get_eeprom' ein, um das EEPROM herunterzuladen.")
+
+    def do_show(self, line):
+        """Show available modules"""
+        all_modules()
+
+    def do_set(self, line):
+        """set options"""
+        try:
+            key, value = line.split(' ')
+            print(key, value)
+            self.parameters.update({key: value})
+        except KeyError:
+            print(f"*** Unknown Option! option not has value!")
+        except ValueError:
+            print(f"*** Option not has value!")
+            print(f"*** Example : set host 127.0.0.1")
+          
+    def do_use(self, line):
+        """Select module for modules"""
+        if line in module_list():
+
+            module = globals()[line]
+            if hasattr(module, 'Main'):
+                module = module.Main()
+                module.prompt = f"rpi-tool > {line} > "
+                module.cmdloop()
             else:
-                stdscr.addstr(y, x, row)
+                print(f"*** Module `{module}` not has `Main` class!")
+
+        else:
+            print(f"*** Module {line} not found!")
+                
+    def do_options(self, line):
+        """Show options of current module"""
+        print("\n")
+        print(f"{'Option':20}\t{'Value':20}")
+        print(f"{'--'*8:<20}\t{'--'*8:<20}")
+        for k,v in self.parameters.items():
+            print(f"{k:20}\t{v:20}")
+        print("\n")
         
-        key = stdscr.getch()
+    def do_back(self, *args):
+        """go back one level"""
+        return True
+
+    def do_about(self, line):
+        """About Us"""
+        about()
+
+    def do_update(self, line):
+        """Check for update"""
+        update(where="update_command")
         
-        if key == curses.KEY_UP and current_row > 0:
-            current_row -= 1
-        elif key == curses.KEY_DOWN and current_row < len(menu) - 1:
-            current_row += 1
-        elif key == 10:  # Enter key
-            if menu[current_row] == "Exit":
-                break
-            elif menu[current_row] == "Get Bootloader":
-                get_bootloader(stdscr)
-            elif menu[current_row] == "Get EEPROM":
-                get_eeprom(stdscr)
-            elif menu[current_row] == "Update":
-                update(stdscr)
-            elif menu[current_row] == "About":
-                about(stdscr)
-            elif menu[current_row] == "Help":
-                help_menu(stdscr)
+    def do_exit(self, line):
+        """exit websploit"""
+        sys.exit(0)
+
+
     
-    stdscr.clear()
-    stdscr.refresh()
 
-def main():
-    curses.wrapper(draw_menu)
+    def complete_use(self, text, line, begidx, endidx):
+        mline = line.partition(' ')[2]
+        offs = len(mline) - len(text)
+        return [s[offs:] for s in completions if s.startswith(mline)]
+    
+    def complete_set(self, text, line, begidx, endidx):
+        mline = line.partition(' ')[2]
+        offs = len(mline) - len(text)
+        return [s[offs:] for s in self.completions if s.startswith(mline)]
 
-if __name__ == "__main__":
-    main()
+    def default(self, line):
+        cmd, arg, line = self.parseline(line)
+        func = [getattr(self, n) for n in self.get_names() if n.startswith('do_' + cmd)]
+        if func: # maybe check if exactly one or more elements, and tell the user
+            func[0](arg)
+        else:
+            os.system(line)
+
+
+
+
+    
+
+
+
+
+def loop():
+    try:
+        RpiBootloaderTool().cmdloop()
+    except KeyboardInterrupt:
+        print("\nBye!")
+
+if __name__ == '__main__':
+    loop()
+
+    
