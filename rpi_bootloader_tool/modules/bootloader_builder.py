@@ -40,7 +40,7 @@ class Main(cmd.Cmd):
     
     
 
-    def do_run(self):
+    def do_run(self, arg):
         """Gesamtes Skript ausführen: Download + Image-Erstellung."""
         print("rpi-tools > Start building bootloader!!!:::...::..:.")
         self.download_files()
@@ -60,7 +60,7 @@ class Main(cmd.Cmd):
 
         return response.json()
 
-    def download_file(file_url, file_path):
+    def download_file(self, file_url, file_path):
         """Lädt eine Datei herunter und zeigt eine Fortschrittsanzeige."""
         response = requests.get(file_url, stream=True)
 

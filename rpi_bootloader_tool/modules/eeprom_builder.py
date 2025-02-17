@@ -17,7 +17,7 @@ class Main(cmd.Cmd):
     """ EEPROM Builder Main Class"""
     
     
-    def do_run(self):
+    def do_run(self, arg):
         print("rpi-tools > Downloading EEPROM!!!:::...::..:.")
         self.get_eeprom()
     
